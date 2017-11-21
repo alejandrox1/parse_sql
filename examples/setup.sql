@@ -10,6 +10,6 @@ create table posts (
 create table comments (
 	id serial prymary key,
 	content text,
-	author carchar(255),
+	author varchar(255),
 	post_id integer references posts(id)
 );
