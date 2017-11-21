@@ -8,7 +8,7 @@ create table posts (
 );
 
 create table comments (
-	id serial prymary key,
+	id serial primary key,
 	content text,
 	author varchar(255),
 	post_id integer references posts(id)
