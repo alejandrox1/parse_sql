@@ -1,43 +1,31 @@
 package parse_sql
 
 import (
+	"database/sql"
 	"io/ioutil"
-	"strings"
 )
 
-// Remove any extrawhitespaces, tabs, and newlines from the command.
-func cleanString(s string) string {
-	return strings.Join(strings.Fields(s), " ")
+type SQLSetup struct {
+	commands []string
 }
 
-// Return a slice of strings with nonempty strings.
-func delEmptyLines(s []string) []string {
-	var newSlice []string
-	for _, str := range s {
-		if str != "" {
-			newSlice = append(newSlice, str)
-		}
-	}
-	return newSlice
-}
-
-// Take sql commands as a single string and return a slice of strings where
-// each string is an sql command.
-func trimSQLCmds(s string) []string {
-	cmds := strings.SplitAfter(s, ";")
-	for i, c := range cmds {
-		cmds[i] = cleanString(c)
-	}
-	return delEmptyLines(cmds)
-}
-
-// Given a filename containing all sql commands to be executed, return a slice
-// of strings with all the commands parsed.
-func SQLCmds(filename string) []string {
+// Get all sql commands from a filename and store them in SQLSetup struct.
+func (s *SQLSetup) ParseCommands(filename string) {
 	sqlSetup, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
+	s.commands = trimSQLCmds(string(sqlSetup))
+}
 
-	return trimSQLCmds(string(sqlSetup))
+// Get all sql commands and execute them.
+func (s *SQLSetup) Init(db *sql.DB, filename string) {
+	s.ParseCommands(filename)
+
+	for _, cmd := range s.commands {
+		_, err := db.Exec(cmd)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
