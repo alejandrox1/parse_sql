@@ -1,4 +1,4 @@
-package parse_sql
+package setup_sqldb
 
 import (
 	"fmt"

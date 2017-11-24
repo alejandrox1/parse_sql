@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 
-	"github.com/alejandrox1/parse_sql"
+	"github.com/alejandrox1/setup_sqldb"
 	_ "github.com/lib/pq"
 )
 
@@ -11,7 +11,7 @@ var Db *sql.DB
 
 func init() {
 	var err error
-	sqlSetup := parse_sql.SQLSetup{
+	sqlSetup := setup_sqldb.SQLSetup{
 		DriverName: "postgres",
 		SQLScript: "setup.sql",
 	}
