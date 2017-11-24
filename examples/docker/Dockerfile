@@ -1,8 +1,8 @@
 FROM alpine:latest
 MAINTAINER Jorge Alarcon
 # go build --tags netgo --ldflags '-extldflags "-lm -lstdc++ -static"'
-ADD sql_setup /usr/bin/sql_setup
+ADD web_service /usr/bin/web_service
 
 WORKDIR app/
 ADD setup.sql .
-ENTRYPOINT ["sql_setup"]
+ENTRYPOINT ["web_service"]

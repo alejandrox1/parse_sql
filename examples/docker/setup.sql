@@ -1,5 +1,5 @@
-drop table posts cascade if exists;
-drop table comments if exists;
+drop table if exists posts cascade;
+drop table if exists comments;
 
 create table posts (
 	id serial primary key,
@@ -7,7 +7,7 @@ create table posts (
 	author varchar(255)
 );
 
-create table contents (
+create table comments (
 	id serial primary key,
 	content text,
 	author varchar(255),

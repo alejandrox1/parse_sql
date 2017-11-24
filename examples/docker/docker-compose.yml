@@ -17,9 +17,14 @@ services:
         ports:
             - 5432:5432
 
-    api:                                                                        
-        build: .                                                                
+    api:                        
+        env_file: environment.env
+        build: .      
+        hostname: api
+        container_name: api
         depends_on:                                                             
             - db                                                                
         networks:                                                               
             - db_net
+        ports:
+            - 8080:8080
