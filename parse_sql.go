@@ -7,24 +7,24 @@ import (
 )
 
 type SQLSetup struct {
-	driverName string
-	sqlScript  string
-	commands   []string
+	DriverName string
+	SQLScript  string
+	Commands   []string
 }
 
 // Get all sql commands from a filename and store them in SQLSetup struct.
 func (s *SQLSetup) ParseCommands() {
-	sqlSetup, err := ioutil.ReadFile(s.sqlScript)
+	sqlSetup, err := ioutil.ReadFile(s.SQLScript)
 	if err != nil {
 		panic(err)
 	}
-	s.commands = trimSQLCmds(string(sqlSetup))
+	s.Commands = trimSQLCmds(string(sqlSetup))
 }
 
 // Get all sql commands and execute them.
 func (s *SQLSetup) Init(maxTries ...int) (Db *sql.DB, err error) {
 	// Create worker pool
-	Db, err = sql.Open(s.driverName, DBDataSource())
+	Db, err = sql.Open(s.DriverName, DBDataSource())
 	if err != nil {
 		return
 	}
@@ -46,7 +46,7 @@ func (s *SQLSetup) Init(maxTries ...int) (Db *sql.DB, err error) {
 
 	// Execute sql commands
 	s.ParseCommands()
-	for _, cmd := range s.commands {
+	for _, cmd := range s.Commands {
 		_, err = Db.Exec(cmd)
 		if err != nil {
 			return
