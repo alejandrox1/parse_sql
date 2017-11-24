@@ -2,6 +2,7 @@ package parse_sql
 
 import (
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -25,6 +26,7 @@ func (s *SQLSetup) Init(db *sql.DB, filename string) {
 	for _, cmd := range s.commands {
 		_, err := db.Exec(cmd)
 		if err != nil {
+			fmt.Println(err)
 			panic(err)
 		}
 	}
