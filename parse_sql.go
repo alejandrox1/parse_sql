@@ -2,17 +2,19 @@ package parse_sql
 
 import (
 	"database/sql"
-	"fmt"
 	"io/ioutil"
+	"time"
 )
 
 type SQLSetup struct {
-	commands []string
+	driverName string
+	sqlScript  string
+	commands   []string
 }
 
 // Get all sql commands from a filename and store them in SQLSetup struct.
-func (s *SQLSetup) ParseCommands(filename string) {
-	sqlSetup, err := ioutil.ReadFile(filename)
+func (s *SQLSetup) ParseCommands() {
+	sqlSetup, err := ioutil.ReadFile(s.sqlScript)
 	if err != nil {
 		panic(err)
 	}
@@ -20,14 +22,36 @@ func (s *SQLSetup) ParseCommands(filename string) {
 }
 
 // Get all sql commands and execute them.
-func (s *SQLSetup) Init(db *sql.DB, filename string) {
-	s.ParseCommands(filename)
+func (s *SQLSetup) Init(maxTries ...int) (Db *sql.DB, err error) {
+	// Create worker pool
+	Db, err = sql.Open(s.driverName, DBDataSource())
+	if err != nil {
+		return
+	}
 
+	// Exponential retry
+	tries := 5
+	delay := time.Duration(500)
+	if len(maxTries) > 0 {
+		tries = maxTries[0]
+	}
+	for ; tries >= 0; tries, delay = tries-1, delay*2 {
+
+		if err = Db.Ping(); err == nil {
+			break
+		} else if err != nil && tries == 0 {
+			return
+		}
+		time.Sleep(delay * time.Millisecond)
+	}
+
+	// Execute sql commands
+	s.ParseCommands()
 	for _, cmd := range s.commands {
-		_, err := db.Exec(cmd)
+		_, err = Db.Exec(cmd)
 		if err != nil {
-			fmt.Println(err)
-			panic(err)
+			return
 		}
 	}
+	return
 }
