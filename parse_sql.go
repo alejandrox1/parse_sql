@@ -36,7 +36,6 @@ func (s *SQLSetup) Init(maxTries ...int) (Db *sql.DB, err error) {
 		tries = maxTries[0]
 	}
 	for ; tries >= 0; tries, delay = tries-1, delay*2 {
-
 		if err = Db.Ping(); err == nil {
 			break
 		} else if err != nil && tries == 0 {
